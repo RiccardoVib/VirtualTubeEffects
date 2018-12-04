@@ -118,7 +118,7 @@ private:
     double fracDelaySamplesLeft_Ref;
     double fracDelaySamplesRight_Ref;
     
-    double buffer[4];
+    //double buffer[4];
     
     int delayBufferLength_;
     int delayBufferLengthRef_;

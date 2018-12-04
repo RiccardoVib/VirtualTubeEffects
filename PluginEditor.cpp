@@ -14,7 +14,7 @@
 //==============================================================================
 VirtualTubeEffectsAudioProcessorEditor::VirtualTubeEffectsAudioProcessorEditor (VirtualTubeEffectsAudioProcessor& p)
     : AudioProcessorEditor (&p), processor (p),
-        tubeLengthLeftLabel_("", "Left Channel:"), tubeLengthRightLabel_("", "Right Channel:"), gainLeftLabel_("", "Left Channel:"), gainRightLabel_("", "Right Channel:"), tubeSizeLabel_("", "Tube Size (cm):"), dryWetMixLabel_("", "Dry/Wet:"), enabledVibratoLabel_("", "Vibrato:"), tubeEndLeftLabel_("", "Left Channel:"),tubeEndRightLabel_("", "Right Channel:"), gainRefLeftLabel_("", "Left Channel:"),gainRefRightLabel_("", "Right Channel:"), frequencyRateLabel_("", "Frequency Rate:"), widthLabel_("", "Width:"), enabledFlangerLabel_("", "Flanger:"), enabledChorusLabel_("", "Chorus:"), feedbackLabel_("", "Feedback:")
+        tubeLengthLeftLabel_("", "Left Channel:"), tubeLengthRightLabel_("", "Right Channel:"), gainLeftLabel_("", "Left Channel:"), gainRightLabel_("", "Right Channel:"), tubeSizeLabel_("", "Tube Size (cm):"), dryWetMixLabel_("", "Dry/Wet:"), tubeEndLeftLabel_("", "Left Channel:"),tubeEndRightLabel_("", "Right Channel:"), gainRefLeftLabel_("", "Left Channel:"),gainRefRightLabel_("", "Right Channel:"), enabledVibratoLabel_("", "Vibrato:"), enabledChorusLabel_("", "Chorus:"), feedbackLabel_("", "Feedback:"), frequencyRateLabel_("", "Frequency Rate:"), widthLabel_("", "Width:"), enabledFlangerLabel_("", "Flanger:")
 
 {
 
@@ -36,8 +36,7 @@ VirtualTubeEffectsAudioProcessorEditor::VirtualTubeEffectsAudioProcessorEditor (
     
     enabledVibratoAttachment = new ButtonAttachment(processor.parameters, "enabledVibrato_", enabledVibratoToggleButton_);
     enabledChorusAttachment = new ButtonAttachment(processor.parameters, "enabledChorus_", enabledChorusToggleButton_);
-    enabledFlangerAttachment = new ButtonAttachment(processor.parameters, "enabledFlanger", enabledFlangerToggleButton_);
-    
+    enabledFlangerAttachment = new ButtonAttachment(processor.parameters, "enabledFlanger_", enabledFlangerToggleButton_);
     
     
     gainText_.setReadOnly(true);
@@ -163,15 +162,19 @@ VirtualTubeEffectsAudioProcessorEditor::VirtualTubeEffectsAudioProcessorEditor (
     
     tubeLengthLeftLabel_.attachToComponent(&tubeLengthLeftSlider_, false);
     tubeLengthLeftLabel_.setFont(Font (14.0f));
+    
     tubeLengthRightLabel_.attachToComponent(&tubeLengthRightSlider_, false);
     tubeLengthRightLabel_.setFont(Font (14.0f));
+    
     gainLeftLabel_.attachToComponent(&gainLeftSlider_, false);
     gainLeftLabel_.setFont(Font (14.0f));
+    
     gainRightLabel_.attachToComponent(&gainRightSlider_, false);
     gainRightLabel_.setFont(Font (14.0f));
     
     tubeSizeLabel_.attachToComponent(&tubeSizeSlider_, false);
     tubeSizeLabel_.setFont(Font (14.0f));
+    
     dryWetMixLabel_.attachToComponent(&dryWetMixSlider_, false);
     dryWetMixLabel_.setFont(Font (14.0f));
  
@@ -232,7 +235,7 @@ VirtualTubeEffectsAudioProcessorEditor::VirtualTubeEffectsAudioProcessorEditor (
     widthSlider_.addListener(this);
     
     frequencyRateSlider_.setSliderStyle(Slider::Rotary);
-    frequencyRateSlider_.setRange (0.1, 14.0, 0.01);
+    frequencyRateSlider_.setRange (0.0, 14.0, 0.01);
     frequencyRateSlider_.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
     frequencyRateSlider_.setPopupDisplayEnabled (true, false, this);
     frequencyRateSlider_.setDoubleClickReturnValue(true, 0.0);
@@ -240,7 +243,7 @@ VirtualTubeEffectsAudioProcessorEditor::VirtualTubeEffectsAudioProcessorEditor (
     frequencyRateSlider_.addListener(this);
     
     feedbackSlider_.setSliderStyle(Slider::Rotary);
-    feedbackSlider_.setRange (0, 0.99, 0.01);
+    feedbackSlider_.setRange (0.0, 0.9, 0.01);
     feedbackSlider_.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
     feedbackSlider_.setPopupDisplayEnabled (true, false, this);
     feedbackSlider_.setDoubleClickReturnValue(true, 0.0);
@@ -268,11 +271,13 @@ void VirtualTubeEffectsAudioProcessorEditor::buttonClicked (Button* button)
     if(button == &enabledVibratoToggleButton_){
 
         *processor.enabledVibrato_ = button->getToggleState();
+        
         if(*processor.enabledVibrato_){
     
             enabledVibratoToggleButton_.setButtonText("On");
             
             enabledFlangerToggleButton_.setButtonText("Off");
+            
             enabledChorusToggleButton_.setButtonText("Off");
             
             *processor.enabledFlanger_ = false;
@@ -281,14 +286,16 @@ void VirtualTubeEffectsAudioProcessorEditor::buttonClicked (Button* button)
             enabledFlangerToggleButton_.setToggleState(false, dontSendNotification);
             enabledChorusToggleButton_.setToggleState(false, dontSendNotification);
             
-            tubeLengthLeftSlider_.setRange (1.0, 3.0, 0.01);
-            tubeLengthLeftSlider_.setValue(1.0);
+            tubeLengthLeftSlider_.setVisible(true);
             
-            tubeLengthRightSlider_.setRange (1.0, 3.0, 0.01);
-            tubeLengthRightSlider_.setValue(1.0);
+            tubeLengthRightSlider_.setVisible(true);
 
-            frequencyRateSlider_.setRange (0.1, 14.0, 0.1);
-            frequencyRateSlider_.setValue(0.1);
+            frequencyRateSlider_.setVisible(true);
+            
+            //
+            feedbackSlider_.setVisible(false);
+            feedbackLabel_.setVisible(false);
+            //
             
         }else{
     
@@ -301,9 +308,15 @@ void VirtualTubeEffectsAudioProcessorEditor::buttonClicked (Button* button)
         
         if(*processor.enabledFlanger_){
             
+            //
+            feedbackSlider_.setVisible(true);
+            feedbackLabel_.setVisible(true);
+            //
+            
             enabledFlangerToggleButton_.setButtonText("On");
             
             enabledVibratoToggleButton_.setButtonText("Off");
+            
             enabledChorusToggleButton_.setButtonText("Off");
             
             *processor.enabledVibrato_ = false;
@@ -312,14 +325,14 @@ void VirtualTubeEffectsAudioProcessorEditor::buttonClicked (Button* button)
             enabledVibratoToggleButton_.setToggleState(false, dontSendNotification);
             enabledChorusToggleButton_.setToggleState(false, dontSendNotification);
             
-            tubeLengthLeftSlider_.setRange (1.0, 4.0, 0.01);
+            /*tubeLengthLeftSlider_.setRange (1.0, 4.0, 0.01);
             tubeLengthLeftSlider_.setValue(1.0);
             
             tubeLengthRightSlider_.setRange (1.0, 4.0, 0.01);
             tubeLengthRightSlider_.setValue(1.0);
 
             frequencyRateSlider_.setRange (0.1, 10.0, 0.1);
-            frequencyRateSlider_.setValue(0.1);
+            frequencyRateSlider_.setValue(0.1);*/
             
         }else{
             
@@ -332,6 +345,11 @@ void VirtualTubeEffectsAudioProcessorEditor::buttonClicked (Button* button)
         
         if(processor.enabledChorus_){
             
+            //
+            feedbackSlider_.setVisible(true);
+            feedbackLabel_.setVisible(true);
+            //
+            
             enabledChorusToggleButton_.setButtonText("On");
             
             enabledVibratoToggleButton_.setButtonText("Off");
@@ -343,14 +361,14 @@ void VirtualTubeEffectsAudioProcessorEditor::buttonClicked (Button* button)
             enabledVibratoToggleButton_.setToggleState(false, dontSendNotification);
             enabledFlangerToggleButton_.setToggleState(false, dontSendNotification);
             
-            tubeLengthLeftSlider_.setRange (7.0, 11.0, 0.01);
+            /*tubeLengthLeftSlider_.setRange (7.0, 11.0, 0.01);
             tubeLengthLeftSlider_.setValue(7.0);
             
             tubeLengthRightSlider_.setRange (7.0, 11.0, 0.01);
             tubeLengthRightSlider_.setValue(7.0);
             
             frequencyRateSlider_.setRange (0.1, 3.0, 0.1);
-            frequencyRateSlider_.setValue(0.1);
+            frequencyRateSlider_.setValue(0.1);*/
             
         }else{
             
@@ -432,7 +450,12 @@ void VirtualTubeEffectsAudioProcessorEditor::sliderValueChanged (Slider* slider)
         processor.mFilter.getCalculatedCoefficients(0);
         processor.mFilter.setValues(*processor.tubeLengthRight_, processor.rad);
         processor.mFilter.getCalculatedCoefficients(1);
-        
+        //changing ref
+        processor.mFilter.setValues(2* (*processor.tubeEndLeft_), processor.rad);
+        processor.mFilter.getCalculatedCoefficients_Ref(0);
+        processor.mFilter.setValues(2* (*processor.tubeEndRight_), processor.rad);
+        processor.mFilter.getCalculatedCoefficients_Ref(1);
+  
     }
     else if (slider == &tubeEndLeftSlider_)
     {
@@ -516,7 +539,7 @@ void VirtualTubeEffectsAudioProcessorEditor::resized()
     
     tubeEndText_.setBounds (220, 130, 140, 20);
     
-    gainRefText_.setBounds (140, 240, 70, 20);
+    gainRefText_.setBounds (70, 240, 100, 20);
     
     //Sliders
     

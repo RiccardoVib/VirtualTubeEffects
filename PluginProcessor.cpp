@@ -36,9 +36,14 @@ VirtualTubeEffectsAudioProcessor::VirtualTubeEffectsAudioProcessor()
     parameters.createAndAddParameter("tubeEndRight_", "tubeEndRight", "tubeEndRight", NormalisableRange<float>(1.0, 2.0), 1, nullptr, nullptr);
     parameters.createAndAddParameter("gainRefLeft_", "gainRefLeft", "gainRefLeft", NormalisableRange<float>(0.0, 9.0), 1, nullptr, nullptr);
     parameters.createAndAddParameter("gainRefRight_", "gainRefRight", "gainRefRight", NormalisableRange<float>(0.0, 9.0), 1, nullptr, nullptr);
-    parameters.createAndAddParameter("feedback_", "feedback", "feedback", NormalisableRange<float>(0.1,0.9), 0.0, nullptr, nullptr);
+    
+    parameters.createAndAddParameter("feedback_", "feedback", "feedback", NormalisableRange<float>(0.0,0.9), 0.0, nullptr, nullptr);
+    
+    
+    
+    
     parameters.createAndAddParameter("width_", "width", "width", NormalisableRange<float>(0.0, 0.9), 0, nullptr, nullptr);
-    parameters.createAndAddParameter("frequencyRate_", "frequencyRate", "frequencyRate", NormalisableRange<float>(0,1), 0.1, nullptr, nullptr);
+    parameters.createAndAddParameter("frequencyRate_", "frequencyRate", "frequencyRate", NormalisableRange<float>(0.0, 14.0), 0.0, nullptr, nullptr);
     
     parameters.createAndAddParameter("enabledVibrato_", "enabledVibrato", "enabledVibrato", NormalisableRange<float>(0,1), false, nullptr, nullptr, true);
     parameters.createAndAddParameter("enabledChorus_", "enabledChorus", "enabledChorus", NormalisableRange<float>(0,1), false, nullptr, nullptr, true);
@@ -172,6 +177,7 @@ void VirtualTubeEffectsAudioProcessor::prepareToPlay (double sampleRate, int sam
     j_3 = 0;
     
     mFilter.setSampleRate(getSampleRate());
+    mDelayLine.setSampleRate(getSampleRate());
     delayBufferLength_ = (int)((4/0.345) * sampleRate/1000);
     delayBufferLengthRef_ = (int)((9/0.345) * sampleRate/1000);
     mDelayLine.initialize();
@@ -236,9 +242,9 @@ void VirtualTubeEffectsAudioProcessor::processBlock (AudioBuffer<float>& buffer,
     float* channelDataL = buffer.getWritePointer(0);
     float* channelDataR = buffer.getWritePointer(1);
 
-    float Width = *width_; //Width = %Delay
+    float width = *width_; //Width = %Delay
     float feedback = *feedback_;
-    float frequency_ = *frequencyRate_;// Vibrato: base 2 - 14 Hz  Flanger: 0.1 Hz to 10 Hz//Chorus: 0.1 to 3 Hz.
+    float frequency = *frequencyRate_;// Vibrato: base 2 - 14 Hz  Flanger: 0.1 Hz to 10 Hz//Chorus: 0.1 to 3 Hz.
     float inverseSampleRate = 1./getSampleRate();
     
     int maxDelayL = *tubeLengthLeft_;// Vibrato: basic delay 1-10 ms, Flanger: basic delay 1-10 ms, Chorus: 20 to 30 ms
@@ -260,7 +266,11 @@ void VirtualTubeEffectsAudioProcessor::processBlock (AudioBuffer<float>& buffer,
     
     double wetValue_ = *dryWetMix_;
     
-    if(enabledVibrato_) {
+    bool enabledVibrato = *enabledVibrato_;
+    bool enabledChorus = *enabledChorus_;
+    bool enabledFlanger = *enabledFlanger_;
+    
+    if(enabledVibrato) {
     
         for (int i = 0; i < numSamples; ++i)
         {
@@ -277,11 +287,11 @@ void VirtualTubeEffectsAudioProcessor::processBlock (AudioBuffer<float>& buffer,
             //double currentDelayR = ((sin(2.0 * M_PI * ph) + 1) * 0.5) * Width * maxDelaySamplesR + 3;
             //double currentDelayRefR = ((sin(2.0 * M_PI * ph) + 1) * 0.5) * Width * maxDelaySamplesRefR + 3;
                 
-            double currentDelayL = maxDelaySamplesL/2 * ((1 + sin(2.0 * M_PI * ph) * Width));
-            double currentDelayR = maxDelaySamplesR/2 * ((1 + sin(2.0 * M_PI * ph) * Width));
+            double currentDelayL = maxDelaySamplesL/2 * ((1 + sin(2.0 * M_PI * ph) * width));
+            double currentDelayR = maxDelaySamplesR/2 * ((1 + sin(2.0 * M_PI * ph) * width));
                 
-            double currentDelayRefL = maxDelaySamplesRefL/2 * ((1 + sin(2.0 * M_PI * ph) * Width));
-            double currentDelayRefR = maxDelaySamplesRefR/2 * ((1 + sin(2.0 * M_PI * ph) * Width));
+            double currentDelayRefL = maxDelaySamplesRefL/2 * ((1 + sin(2.0 * M_PI * ph) * width));
+            double currentDelayRefR = maxDelaySamplesRefR/2 * ((1 + sin(2.0 * M_PI * ph) * width));
             
             outL = computeOutFilter_L(inL);
             double xL = outL;
@@ -299,18 +309,18 @@ void VirtualTubeEffectsAudioProcessor::processBlock (AudioBuffer<float>& buffer,
             outL =  currentGain_L * mDelayLine.delayLine_Vibrato_L(xL, currentDelayL) + currentGainRef_L * mDelayLine.delayLine_Vibrato_Ref_L(x_fin_L, currentDelayRefL);
                 
             outR =  currentGain_R * mDelayLine.delayLine_Vibrato_R(xR, currentDelayR) + currentGainRef_R * mDelayLine.delayLine_Vibrato_Ref_R(x_fin_R, currentDelayRefR);
-                
+             
             channelDataR[i] = outL;
             channelDataL[i] = outR;
             
             
-            ph += frequency_*inverseSampleRate;
+            ph += frequency*inverseSampleRate;
             if(ph >= 1.0){
                 ph -= 1.0;
             }
         }
         
-    }else if(enabledFlanger_){
+    }else if(enabledFlanger){
             
         for (int i = 0; i < numSamples; ++i)
         {
@@ -322,11 +332,11 @@ void VirtualTubeEffectsAudioProcessor::processBlock (AudioBuffer<float>& buffer,
                 
             process();
             
-            double currentDelayL = maxDelaySamplesL/2 * ((1 + sin(2.0 * M_PI * ph) * Width));
-            double currentDelayR = maxDelaySamplesR/2 * ((1 + sin(2.0 * M_PI * ph) * Width));
+            double currentDelayL = maxDelaySamplesL/2 * ((1 + sin(2.0 * M_PI * ph) * width));
+            double currentDelayR = maxDelaySamplesR/2 * ((1 + sin(2.0 * M_PI * ph) * width));
                 
-            double currentDelayRefL = maxDelaySamplesRefL/2 * ((1 + sin(2.0 * M_PI * ph) * Width));
-            double currentDelayRefR = maxDelaySamplesRefR/2 * ((1 + sin(2.0 * M_PI * ph) * Width));
+            double currentDelayRefL = maxDelaySamplesRefL/2 * ((1 + sin(2.0 * M_PI * ph) * width));
+            double currentDelayRefR = maxDelaySamplesRefR/2 * ((1 + sin(2.0 * M_PI * ph) * width));
 
             outL = computeOutFilter_L(inL);
             double xL = outL;
@@ -343,18 +353,18 @@ void VirtualTubeEffectsAudioProcessor::processBlock (AudioBuffer<float>& buffer,
             outL =  inL + (wetValue_) * (currentGain_L * mDelayLine.delayLine_Vibrato_L(xL * feedback, currentDelayL) + currentGainRef_L * mDelayLine.delayLine_Vibrato_Ref_L(x_fin_L * feedback, currentDelayRefL));
             
             outR =  inR + (wetValue_) * (currentGain_R * mDelayLine.delayLine_Vibrato_R(xR * feedback, currentDelayR) + currentGainRef_R * mDelayLine.delayLine_Vibrato_Ref_R(x_fin_R * feedback, currentDelayRefR));
-                
+    
             channelDataR[i] = outL;
             channelDataL[i] = outR;
                 
                 
-            ph += frequency_*inverseSampleRate;
+            ph += frequency*inverseSampleRate;
             if(ph >= 1.0){
                 ph -= 1.0;
             }
         }
             
-    }else if(enabledChorus_){
+    }else if(enabledChorus){
         
         for (int i = 0; i < numSamples; ++i)
         {
@@ -366,11 +376,11 @@ void VirtualTubeEffectsAudioProcessor::processBlock (AudioBuffer<float>& buffer,
                     
             process();
                 
-            double currentDelayL = maxDelaySamplesL/2 * ((1 + sin(2.0 * M_PI * ph) * Width));
-            double currentDelayR = maxDelaySamplesR/2 * ((1 + sin(2.0 * M_PI * ph) * Width));
+            double currentDelayL = maxDelaySamplesL/2 * ((1 + sin(2.0 * M_PI * ph) * width));
+            double currentDelayR = maxDelaySamplesR/2 * ((1 + sin(2.0 * M_PI * ph) * width));
                 
-            double currentDelayRefL = maxDelaySamplesRefL/2 * ((1 + sin(2.0 * M_PI * ph) * Width));
-            double currentDelayRefR = maxDelaySamplesRefR/2 * ((1 + sin(2.0 * M_PI * ph) * Width));
+            double currentDelayRefL = maxDelaySamplesRefL/2 * ((1 + sin(2.0 * M_PI * ph) * width));
+            double currentDelayRefR = maxDelaySamplesRefR/2 * ((1 + sin(2.0 * M_PI * ph) * width));
 
             outL = computeOutFilter_L(inL);
             double xL = outL;
@@ -388,12 +398,12 @@ void VirtualTubeEffectsAudioProcessor::processBlock (AudioBuffer<float>& buffer,
             outL =  inL + (wetValue_) * (currentGain_L * mDelayLine.delayLine_Vibrato_L(xL * feedback, currentDelayL) + currentGainRef_L * mDelayLine.delayLine_Vibrato_Ref_L(x_fin_L * feedback, currentDelayRefL));
             
             outR =  inR + (wetValue_) * (currentGain_R * mDelayLine.delayLine_Vibrato_R(xR * feedback, currentDelayR) + currentGainRef_R * mDelayLine.delayLine_Vibrato_Ref_R(x_fin_R * feedback, currentDelayRefR));
-                    
+    
             channelDataR[i] = outL;
             channelDataL[i] = outR;
                     
                     
-            ph += frequency_*inverseSampleRate;
+            ph += frequency*inverseSampleRate;
             if(ph >= 1.0){
                 ph -= 1.0;
             }

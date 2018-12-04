@@ -88,8 +88,6 @@ public:
     float* gainRefLeft_ = nullptr; // Gain
     float* gainRefRight_ = nullptr;
     
-    
-    float* enabledReflection_ = nullptr;
     float* enabledVibrato_ = nullptr;
     float* enabledFlanger_ = nullptr;
     float* enabledChorus_ = nullptr;
@@ -116,9 +114,9 @@ public:
     
     //Vibrato
     
-    float* frequencyRate_;
-    float* width_;
-    float* feedback_;
+    float* frequencyRate_ = nullptr;
+    float* width_ = nullptr;
+    float* feedback_ = nullptr;
     
     AudioProcessorValueTreeState parameters;
     
@@ -150,7 +148,7 @@ private:
     int delayBufferLengthRef_;
     float ph;
      // Circular buffer variables for implementing delay
-    AudioBuffer<float> delayBufferLeft_2, delayBufferRight_2, delayBufferLeftRef_2, delayBufferRightRef_2;
+    //AudioBuffer<float> delayBufferLeft_2, delayBufferRight_2, delayBufferLeftRef_2, delayBufferRightRef_2;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VirtualTubeEffectsAudioProcessor)

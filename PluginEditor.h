@@ -42,8 +42,7 @@ public:
     typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
     
 private:
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it.
+    
     VirtualTubeEffectsAudioProcessor& processor;
     
     Label tubeLengthLeftLabel_, tubeLengthRightLabel_, gainLeftLabel_, gainRightLabel_, tubeSizeLabel_, dryWetMixLabel_, tubeEndLeftLabel_, tubeEndRightLabel_, gainRefLeftLabel_, gainRefRightLabel_;
