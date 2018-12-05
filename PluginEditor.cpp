@@ -389,7 +389,6 @@ void VirtualTubeEffectsAudioProcessorEditor::sliderValueChanged (Slider* slider)
         processor.leng_L = processor.mFilter.setLengt(*processor.tubeLengthLeft_);
         processor.delayMilli_L = processor.mFilter.setDelayMilliseconds(processor.leng_L);
         processor.delaySamples_L = processor.mFilter.setDelaySamples(processor.delayMilli_L);
-        processor.mDelayLine.setDelayL(processor.delaySamples_L);
         processor.mFilter.setValues(*processor.tubeLengthLeft_, processor.rad);
         processor.mFilter.getCalculatedCoefficients(0);
         

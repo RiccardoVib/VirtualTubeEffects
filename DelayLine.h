@@ -61,18 +61,6 @@ public:
         
     }
     
-    void setDelayL(double samples);
-    void setDelayR(double samples);
-    
-    double delayLineL(double input);
-    double delayLineR(double input);
-    
-    void setDelay_Ref_L(double samples);
-    void setDelay_Ref_R(double samples);
-    
-    double delayLine_Ref_L(double input);
-    double delayLine_Ref_R(double input);
-    
     void suspend(); // flush buffers
     
     void initialize(){

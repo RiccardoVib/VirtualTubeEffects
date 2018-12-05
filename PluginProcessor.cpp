@@ -187,14 +187,12 @@ void VirtualTubeEffectsAudioProcessor::prepareToPlay (double sampleRate, int sam
     leng_L = mFilter.setLengt(*tubeLengthLeft_);
     delayMilli_L = mFilter.setDelayMilliseconds(leng_L);
     delaySamples_L = mFilter.setDelaySamples(delayMilli_L);
-    mDelayLine.setDelayL(delaySamples_L);
     mFilter.setValues(*tubeLengthLeft_, rad);
     mFilter.getCalculatedCoefficients(0);
 
     leng_R = mFilter.setLengt(*tubeLengthRight_);
     delayMilli_R = mFilter.setDelayMilliseconds(leng_R);
     delaySamples_R = mFilter.setDelaySamples(delayMilli_R);
-    mDelayLine.setDelayR(delaySamples_R);
     mFilter.setValues(*tubeLengthRight_, rad);
     mFilter.getCalculatedCoefficients(1);
 }
