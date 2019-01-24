@@ -14,179 +14,168 @@
 //==============================================================================
 VirtualTubeFlangerAudioProcessorEditor::VirtualTubeFlangerAudioProcessorEditor (VirtualTubeFlangerAudioProcessor& p)
     : AudioProcessorEditor (&p), processor (p),
-        tubeLengthLeftLabel_("", "Left Channel:"), tubeLengthRightLabel_("", "Right Channel:"), gainLeftLabel_("", "Left Channel:"), gainRightLabel_("", "Right Channel:"), tubeSizeLabel_("", "Tube Size (cm):"), dryWetMixLabel_("", "Dry/Wet:"), tubeEndLeftLabel_("", "Left Channel:"),tubeEndRightLabel_("", "Right Channel:"), gainRefLeftLabel_("", "Left Channel:"),gainRefRightLabel_("", "Right Channel:"), frequencyRateLabel_("", "Frequency Rate:"), widthLabel_("", "Width:"), feedbackLabel_("", "Feedback:")
+        delayTimeLeftLabel_("", "Left Channel:"), delayTimeRightLabel_("", "Right Channel:"), gainLeftLabel_("", "Left Channel:"), gainRightLabel_("", "Right Channel:"), tubeSizeLabel_("", "Tube Size (cm):"), dryWetMixLabel_("", "Dry/Wet:"), delayTimeRefLeftLabel_("", "Left Channel:"),delayTimeRefRightLabel_("", "Right Channel:"), gainRefLeftLabel_("", "Left Channel:"),gainRefRightLabel_("", "Right Channel:"), frequencyRateLabel_("", "Frequency Rate:"), widthLabel_("", "Width:"), feedbackLabel_("", "Feedback:")
 {
    
     setSize (800, 400);
     
-    tubeLengthLeftAttachment = new SliderAttachment(processor.parameters, "tubeLengthLeft_", tubeLengthLeftSlider_);
-    tubeLengthRightAttachment = new SliderAttachment(processor.parameters, "tubeLengthRight_", tubeLengthRightSlider_);
+    delayTimeLeftAttachment = new SliderAttachment(processor.parameters, "delayTimeLeft_", delayTimeLeftSlider_);
+    delayTimeRightAttachment = new SliderAttachment(processor.parameters, "delayTimeRight_", delayTimeRightSlider_);
     gainLeftAttachment = new SliderAttachment(processor.parameters, "gainLeft_", gainLeftSlider_);
     gainRightAttachment = new SliderAttachment(processor.parameters, "gainRight_", gainRightSlider_);
     tubeSizeAttachment = new SliderAttachment(processor.parameters, "tubeSize_", tubeSizeSlider_);
     dryWetMixAttachment = new SliderAttachment(processor.parameters, "dryWetMix_", dryWetMixSlider_);
-    tubeEndLeftAttachment = new SliderAttachment(processor.parameters, "tubeEndLeft_", tubeEndLeftSlider_);
-    tubeEndRightAttachment = new SliderAttachment(processor.parameters, "tubeEndRight_", tubeEndRightSlider_);
+    delayTimeRefLeftAttachment = new SliderAttachment(processor.parameters, "delayTimeRefLeft_", delayTimeRefLeftSlider_);
+    delayTimeRefRightAttachment = new SliderAttachment(processor.parameters, "delayTimeRefRight_", delayTimeRefRightSlider_);
     gainRefLeftAttachment = new SliderAttachment(processor.parameters, "gainRefLeft_", gainRefLeftSlider_);
     gainRefRightAttachment = new SliderAttachment(processor.parameters, "gainRefRight_", gainRefRightSlider_);
     frequencyRateAttachment = new SliderAttachment(processor.parameters, "frequencyRate_", frequencyRateSlider_);
     widthAttachment = new SliderAttachment(processor.parameters, "width_", widthSlider_);
     feedbackAttachment = new SliderAttachment(processor.parameters, "feedback_", feedbackSlider_);
-
-
     
-    
-    gainText_.setReadOnly(true);
-    gainText_.setText("Gain Level");
-    addAndMakeVisible (&gainText_);
-    
-    gainRefText_.setReadOnly(true);
-    gainRefText_.setText("Reflection Level");
-    addAndMakeVisible (&gainRefText_);
-    
-    tubeLengthText_.setReadOnly(true);
-    tubeLengthText_.setText("Tube Length (m)");
-    addAndMakeVisible(&tubeLengthText_);
-    
-    tubeEndText_.setReadOnly(true);
-    tubeEndText_.setText("Tube End Distance (m)");
-    addAndMakeVisible(&tubeEndText_);
+    delayTimeText_.setReadOnly(true);
+    delayTimeText_.setText("Delay Time (ms)");
+    addAndMakeVisible(&delayTimeText_);
     
     delayMsL_.setReadOnly(true);
-    delayMsL_.setText(createTextForDelays(processor.delayMilli_L));
+    delayMsL_.setText(createTextForDelays(processor.delayMilli[0]));
     addAndMakeVisible (&delayMsL_);
     
     delayMsR_.setReadOnly(true);
-    delayMsR_.setText(createTextForDelays(processor.delayMilli_R));
+    delayMsR_.setText(createTextForDelays(processor.delayMilli[1]));
     addAndMakeVisible (&delayMsR_);
     
     delayMsRefL_.setReadOnly(true);
-    delayMsRefL_.setText(createTextForDelays(processor.delayMilliRef_L));
+    delayMsRefL_.setText(createTextForDelays(processor.delayMilliRef[0]));
     addAndMakeVisible (&delayMsRefL_);
     
     delayMsRefR_.setReadOnly(true);
-    delayMsRefR_.setText(createTextForDelays(processor.delayMilliRef_L));
+    delayMsRefR_.setText(createTextForDelays(processor.delayMilliRef[1]));
     addAndMakeVisible (&delayMsRefR_);
     
-    tubeLengthLeftSlider_.setSliderStyle(Slider::LinearBar);
-    tubeLengthLeftSlider_.setRange (1.0, 4.0, 0.01);
-    tubeLengthLeftSlider_.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-    tubeLengthLeftSlider_.setPopupDisplayEnabled(true, false, this);
-    tubeLengthLeftSlider_.setTextValueSuffix(" m");
-    tubeLengthLeftSlider_.setDoubleClickReturnValue(true, 10.0);
-    addAndMakeVisible (&tubeLengthLeftSlider_);
-    tubeLengthLeftSlider_.addListener(this);
+    delayTimeLeftSlider_.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
+    delayTimeLeftSlider_.setRange (3.0f, 10.0f, 0.01f);
+    delayTimeLeftSlider_.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
+    delayTimeLeftSlider_.setPopupDisplayEnabled(false, false, this);
+    delayTimeLeftSlider_.setTextValueSuffix(" ms");
+    delayTimeLeftSlider_.setDoubleClickReturnValue(true, 3.0f);
+    addAndMakeVisible (&delayTimeLeftSlider_);
+    delayTimeLeftSlider_.addListener(this);
     
-    tubeLengthRightSlider_.setSliderStyle(Slider::LinearBar);
-    tubeLengthRightSlider_.setRange (1.0, 4.0, 0.01);
-    tubeLengthRightSlider_.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-    tubeLengthRightSlider_.setPopupDisplayEnabled (true, false, this);
-    tubeLengthRightSlider_.setTextValueSuffix(" m");
-    tubeLengthRightSlider_.setDoubleClickReturnValue(true, 10.0);
-    addAndMakeVisible (&tubeLengthRightSlider_);
-    tubeLengthRightSlider_.addListener(this);
+    delayTimeRightSlider_.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
+    delayTimeRightSlider_.setRange (3.0f, 10.0f, 0.01f);
+    delayTimeRightSlider_.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
+    delayTimeRightSlider_.setPopupDisplayEnabled (false, false, this);
+    delayTimeRightSlider_.setTextValueSuffix(" ms");
+    delayTimeRightSlider_.setDoubleClickReturnValue(true, 3.0f);
+    addAndMakeVisible (&delayTimeRightSlider_);
+    delayTimeRightSlider_.addListener(this);
     
     gainLeftSlider_.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-    gainLeftSlider_.setRange (0.0, 3.0, 0.01);
+    gainLeftSlider_.setRange (-128.0f, 9.0f, 0.01f);
     gainLeftSlider_.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
     gainLeftSlider_.setPopupDisplayEnabled (true, false, this);
     gainLeftSlider_.setTextValueSuffix(" dB");
-    gainLeftSlider_.setDoubleClickReturnValue(true, 0.0);
+    gainLeftSlider_.setDoubleClickReturnValue(true, 0.0f);
+    gainLeftSlider_.setSkewFactorFromMidPoint(0.0f);
     addAndMakeVisible (&gainLeftSlider_);
     gainLeftSlider_.addListener(this);
     
     gainRightSlider_.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-    gainRightSlider_.setRange (0.0, 3.0, 0.01);
+    gainRightSlider_.setRange (-128.0f, 9.0f, 0.01f);
     gainRightSlider_.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
     gainRightSlider_.setPopupDisplayEnabled (true, false, this);
     gainRightSlider_.setTextValueSuffix(" dB");
-    gainRightSlider_.setDoubleClickReturnValue(true, 0.0);
+    gainRightSlider_.setDoubleClickReturnValue(true, 0.0f);
+    gainRightSlider_.setSkewFactorFromMidPoint(0.0f);
     addAndMakeVisible (&gainRightSlider_);
     gainRightSlider_.addListener(this);
     
     tubeSizeSlider_.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-    tubeSizeSlider_.setRange (1.2, 2.5, 0.1);
+    tubeSizeSlider_.setRange (1.2f, 2.5f, 0.1f);
     tubeSizeSlider_.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
     tubeSizeSlider_.setPopupDisplayEnabled (true, false, this);
     tubeSizeSlider_.setTextValueSuffix(" cm");
-    tubeSizeSlider_.setDoubleClickReturnValue(true, 0.0);
+    tubeSizeSlider_.setDoubleClickReturnValue(true, 1.2f);
     addAndMakeVisible (&tubeSizeSlider_);
     tubeSizeSlider_.addListener(this);
     
     dryWetMixSlider_.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-    dryWetMixSlider_.setRange (0.0, 1.0, 0.01);
+    dryWetMixSlider_.setRange (0.0f, 1.0f, 0.01f);
     dryWetMixSlider_.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
     dryWetMixSlider_.setPopupDisplayEnabled (true, false, this);
-    dryWetMixSlider_.setDoubleClickReturnValue(true, 0.0);
+    dryWetMixSlider_.setDoubleClickReturnValue(true, 0.0f);
     addAndMakeVisible (&dryWetMixSlider_);
     dryWetMixSlider_.addListener(this);
     
-    tubeEndLeftSlider_.setSliderStyle(Slider::LinearBar);
-    tubeEndLeftSlider_.setRange (1.0, 2.0, 0.01);
-    tubeEndLeftSlider_.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-    tubeEndLeftSlider_.setPopupDisplayEnabled(true, false, this);
-    tubeEndLeftSlider_.setTextValueSuffix(" m");
-    tubeEndLeftSlider_.setDoubleClickReturnValue(true, 10.0);
-    addAndMakeVisible (&tubeEndLeftSlider_);
-    tubeEndLeftSlider_.addListener(this);
+    delayTimeRefLeftSlider_.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
+    delayTimeRefLeftSlider_.setRange (3.0f, 10.0f, 0.01f);
+    delayTimeRefLeftSlider_.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
+    delayTimeRefLeftSlider_.setPopupDisplayEnabled(false, false, this);
+    delayTimeRefLeftSlider_.setTextValueSuffix(" ms");
+    delayTimeRefLeftSlider_.setDoubleClickReturnValue(true, 3.0f);
+    addAndMakeVisible (&delayTimeRefLeftSlider_);
+    delayTimeRefLeftSlider_.addListener(this);
     
-    tubeEndRightSlider_.setSliderStyle(Slider::LinearBar);
-    tubeEndRightSlider_.setRange (1.0, 2.0, 0.01);
-    tubeEndRightSlider_.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
-    tubeEndRightSlider_.setPopupDisplayEnabled (true, false, this);
-    tubeEndRightSlider_.setTextValueSuffix(" m");
-    tubeEndRightSlider_.setDoubleClickReturnValue(true, 10.0);
-    addAndMakeVisible (&tubeEndRightSlider_);
-    tubeEndRightSlider_.addListener(this);
+    delayTimeRefRightSlider_.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
+    delayTimeRefRightSlider_.setRange (3.0f, 10.0f, 0.01f);
+    delayTimeRefRightSlider_.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
+    delayTimeRefRightSlider_.setPopupDisplayEnabled (false, false, this);
+    delayTimeRefRightSlider_.setTextValueSuffix(" ms");
+    delayTimeRefRightSlider_.setDoubleClickReturnValue(true, 3.0f);
+    addAndMakeVisible (&delayTimeRefRightSlider_);
+    delayTimeRefRightSlider_.addListener(this);
     
     gainRefLeftSlider_.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-    gainRefLeftSlider_.setRange (0.0, 9.0, 0.01);
+    gainRefLeftSlider_.setRange (-128.0f, 19.0f, 0.01f);
     gainRefLeftSlider_.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
     gainRefLeftSlider_.setPopupDisplayEnabled (true, false, this);
     gainRefLeftSlider_.setTextValueSuffix(" dB");
-    gainRefLeftSlider_.setDoubleClickReturnValue(true, 0.0);
+    gainRefLeftSlider_.setDoubleClickReturnValue(true, 0.0f);
+    gainRefLeftSlider_.setSkewFactorFromMidPoint(0.0f);
     addAndMakeVisible (&gainRefLeftSlider_);
     gainRefLeftSlider_.addListener(this);
     
     gainRefRightSlider_.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-    gainRefRightSlider_.setRange (0.0, 9.0, 0.01);
+    gainRefRightSlider_.setRange (-128.0f, 19.0f, 0.01f);
     gainRefRightSlider_.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
     gainRefRightSlider_.setPopupDisplayEnabled (true, false, this);
     gainRefRightSlider_.setTextValueSuffix(" dB");
-    gainRefRightSlider_.setDoubleClickReturnValue(true, 0.0);
+    gainRefRightSlider_.setDoubleClickReturnValue(true, 0.0f);
+    gainRefRightSlider_.setSkewFactorFromMidPoint(0.0f);
     addAndMakeVisible (&gainRefRightSlider_);
     gainRefRightSlider_.addListener(this);
     
     widthSlider_.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-    widthSlider_.setRange (0.0, 0.9, 0.01);
+    widthSlider_.setRange (0.0f, 1.0f, 0.01f);
     widthSlider_.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
     widthSlider_.setPopupDisplayEnabled (true, false, this);
-    widthSlider_.setDoubleClickReturnValue(true, 0.0);
+    widthSlider_.setDoubleClickReturnValue(true, 0.0f);
     addAndMakeVisible (&widthSlider_);
     widthSlider_.addListener(this);
     
     frequencyRateSlider_.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-    frequencyRateSlider_.setRange (0.0, 10.0, 0.01);
+    frequencyRateSlider_.setRange (0.1f, 10.0f, 0.01f);
     frequencyRateSlider_.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
     frequencyRateSlider_.setPopupDisplayEnabled (true, false, this);
-    frequencyRateSlider_.setDoubleClickReturnValue(true, 0.0);
+    frequencyRateSlider_.setDoubleClickReturnValue(true, 0.1f);
     addAndMakeVisible (&frequencyRateSlider_);
     frequencyRateSlider_.addListener(this);
     
     feedbackSlider_.setSliderStyle(Slider::RotaryHorizontalVerticalDrag);
-    feedbackSlider_.setRange (0.0, 0.9, 0.01);
+    feedbackSlider_.setRange (0.0f, 0.9f, 0.01f);
     feedbackSlider_.setTextBoxStyle(Slider::NoTextBox, false, 90, 0);
     feedbackSlider_.setPopupDisplayEnabled (true, false, this);
-    feedbackSlider_.setDoubleClickReturnValue(true, 0.0);
+    feedbackSlider_.setDoubleClickReturnValue(true, 0.0f);
     addAndMakeVisible (&feedbackSlider_);
     feedbackSlider_.addListener(this);
-
     
-    tubeLengthLeftLabel_.attachToComponent(&tubeLengthLeftSlider_, false);
-    tubeLengthLeftLabel_.setFont(Font (14.0f));
     
-    tubeLengthRightLabel_.attachToComponent(&tubeLengthRightSlider_, false);
-    tubeLengthRightLabel_.setFont(Font (14.0f));
+    delayTimeLeftLabel_.attachToComponent(&delayTimeLeftSlider_, false);
+    delayTimeLeftLabel_.setFont(Font (14.0f));
+    
+    delayTimeRightLabel_.attachToComponent(&delayTimeRightSlider_, false);
+    delayTimeRefRightLabel_.setFont(Font (14.0f));
     
     gainLeftLabel_.attachToComponent(&gainLeftSlider_, false);
     gainLeftLabel_.setFont(Font (14.0f));
@@ -200,11 +189,11 @@ VirtualTubeFlangerAudioProcessorEditor::VirtualTubeFlangerAudioProcessorEditor (
     dryWetMixLabel_.attachToComponent(&dryWetMixSlider_, false);
     dryWetMixLabel_.setFont(Font (14.0f));
     
-    tubeEndLeftLabel_.attachToComponent(&tubeEndLeftSlider_, false);
-    tubeEndLeftLabel_.setFont(Font (14.0f));
+    delayTimeRefLeftLabel_.attachToComponent(&delayTimeRefLeftSlider_, false);
+    delayTimeRefLeftLabel_.setFont(Font (14.0f));
     
-    tubeEndRightLabel_.attachToComponent(&tubeEndRightSlider_, false);
-    tubeEndRightLabel_.setFont(Font (14.0f));
+    delayTimeRefRightLabel_.attachToComponent(&delayTimeRefRightSlider_, false);
+    delayTimeRefRightLabel_.setFont(Font (14.0f));
     
     gainRefLeftLabel_.attachToComponent(&gainRefLeftSlider_, false);
     gainRefLeftLabel_.setFont(Font (14.0f));
@@ -223,7 +212,6 @@ VirtualTubeFlangerAudioProcessorEditor::VirtualTubeFlangerAudioProcessorEditor (
     
     feedbackLabel_.attachToComponent(&feedbackSlider_, false);
     feedbackLabel_.setFont(Font (14.0f));
-    
 }
 
 VirtualTubeFlangerAudioProcessorEditor::~VirtualTubeFlangerAudioProcessorEditor()
@@ -232,38 +220,21 @@ VirtualTubeFlangerAudioProcessorEditor::~VirtualTubeFlangerAudioProcessorEditor(
 
 void VirtualTubeFlangerAudioProcessorEditor::sliderValueChanged (Slider* slider)
 {
-    if (slider == &tubeLengthLeftSlider_)
+    if (slider == &delayTimeLeftSlider_)
     {
-        *processor.tubeLengthLeft_ = tubeLengthLeftSlider_.getValue();
+        *processor.delayTimeLeft_ = delayTimeLeftSlider_.getValue();
         
-        processor.leng_L = processor.mFilter.setLengt(*processor.tubeLengthLeft_);
-        processor.delayMilli_L = processor.mFilter.setDelayMilliseconds(processor.leng_L);
-        
-        std::string delayText = createTextForDelays(processor.delayMilli_L);
+        std::string delayText = createTextForDelays(delayTimeLeftSlider_.getValue());
         delayMsL_.setText(delayText);
         
-        processor.lengRef_L = processor.leng_L + processor.mFilter.setLengt(*processor.tubeEndLeft_);
-        processor.delayMilliRef_L = processor.mFilter.setDelayMilliseconds(processor.lengRef_L);
-        
-        std::string delayTextRef = createTextForDelays(processor.delayMilliRef_L);
-        delayMsRefL_.setText(delayTextRef);
-        
     }
-    else if (slider == &tubeLengthRightSlider_)
+    else if (slider == &delayTimeRightSlider_)
     {
-        *processor.tubeLengthRight_ = tubeLengthRightSlider_.getValue();
+        *processor.delayTimeRight_ = delayTimeRightSlider_.getValue();
         
-        processor.leng_R = processor.mFilter.setLengt(*processor.tubeLengthRight_);
-        processor.delayMilli_R = processor.mFilter.setDelayMilliseconds(processor.leng_R);
-        
-        std::string delayText = createTextForDelays(processor.delayMilli_R);
+        std::string delayText = createTextForDelays(delayTimeRightSlider_.getValue());
         delayMsR_.setText(delayText);
         
-        processor.lengRef_R = processor.leng_R + processor.mFilter.setLengt(*processor.tubeEndRight_);
-        processor.delayMilliRef_R = processor.mFilter.setDelayMilliseconds(processor.lengRef_R);
-        
-        std::string delayTextRef = createTextForDelays(processor.delayMilliRef_R);
-        delayMsRefR_.setText(delayTextRef);
     }
     else if (slider == &gainLeftSlider_)
     {
@@ -282,25 +253,19 @@ void VirtualTubeFlangerAudioProcessorEditor::sliderValueChanged (Slider* slider)
         *processor.tubeSize_ = tubeSizeSlider_.getValue();
         
     }
-    else if (slider == &tubeEndLeftSlider_)
+    else if (slider == &delayTimeRefLeftSlider_)
     {
-        *processor.tubeEndLeft_ = tubeEndLeftSlider_.getValue();
+        *processor.delayTimeRefLeft_ = delayTimeRefLeftSlider_.getValue();
         
-        processor.lengRef_L = processor.leng_L + processor.mFilter.setLengt(*processor.tubeEndLeft_);
-        processor.delayMilliRef_L = processor.mFilter.setDelayMilliseconds(processor.lengRef_L);
-        
-        std::string delayText = createTextForDelays(processor.delayMilliRef_L);
+        std::string delayText = createTextForDelays(delayTimeRefLeftSlider_.getValue());
         delayMsRefL_.setText(delayText);
         
     }
-    else if (slider == &tubeEndRightSlider_)
+    else if (slider == &delayTimeRefRightSlider_)
     {
-        *processor.tubeEndRight_ = tubeEndRightSlider_.getValue();
+        *processor.delayTimeRefRight_ = delayTimeRefRightSlider_.getValue();
         
-        processor.lengRef_R = processor.leng_R + processor.mFilter.setLengt(*processor.tubeEndRight_);
-        processor.delayMilliRef_R = processor.mFilter.setDelayMilliseconds(processor.lengRef_R);
-        
-        std::string delayText = createTextForDelays(processor.delayMilliRef_R);
+        std::string delayText = createTextForDelays(delayTimeRefRightSlider_.getValue());
         delayMsRefR_.setText(delayText);
         
     }
@@ -339,27 +304,25 @@ void VirtualTubeFlangerAudioProcessorEditor::resized()
 {
     //Texts
     
-    delayMsL_.setBounds (30, 70, 70, 20);
+    delayMsL_.setBounds (35, 130, 70, 20);
     
-    delayMsR_.setBounds (300, 70, 70, 20);
+    delayMsR_.setBounds (135, 130, 70, 20);
     
-    delayMsRefL_.setBounds (30, 200, 70, 20);
+    delayMsRefL_.setBounds (35, 260, 70, 20);
     
-    delayMsRefR_.setBounds (300, 200, 70, 20);
+    delayMsRefR_.setBounds (135, 260, 70, 20);
     
-    gainText_.setBounds (860, 5, 70, 20);
-    
-    tubeLengthText_.setBounds (240, 5, 110, 20);
-    
-    tubeEndText_.setBounds (220, 130, 140, 20);
-    
-    gainRefText_.setBounds (70, 240, 100, 20);
+    delayTimeText_.setBounds (100, 5, 110, 20);
     
     //Sliders
     
-    tubeLengthLeftSlider_.setBounds (30, 50, 250, 20);
+    delayTimeLeftSlider_.setBounds (30, 50, 80, 100);
     
-    tubeLengthRightSlider_.setBounds (300, 50, 250, 20);
+    delayTimeRightSlider_.setBounds (130, 50, 80, 100);
+    
+    delayTimeRefLeftSlider_.setBounds (30, 180, 80, 100);
+    
+    delayTimeRefRightSlider_.setBounds (130, 180, 80, 100);
     
     gainLeftSlider_.setBounds (600, 50, 80, 100);
     
@@ -367,20 +330,16 @@ void VirtualTubeFlangerAudioProcessorEditor::resized()
     
     dryWetMixSlider_.setBounds (700, 290, 80, 100);
     
-    tubeSizeSlider_.setBounds (700, 160, 80, 100);
+    tubeSizeSlider_.setBounds (230, 290, 80, 100);
     
-    tubeEndLeftSlider_.setBounds (30, 180, 150, 20);
+    gainRefLeftSlider_.setBounds (600, 180, 80, 100);
     
-    tubeEndRightSlider_.setBounds (300, 180, 150, 20);
+    gainRefRightSlider_.setBounds (700, 180, 80, 100);
     
-    gainRefLeftSlider_.setBounds (30, 290, 80, 100);
+    widthSlider_.setBounds (330, 290, 80, 100);
     
-    gainRefRightSlider_.setBounds (130, 290, 80, 100);
+    frequencyRateSlider_.setBounds (430, 290, 80, 100);
     
-    widthSlider_.setBounds (400, 290, 80, 100);
-    
-    frequencyRateSlider_.setBounds (500, 290, 80, 100);
-    
-    feedbackSlider_.setBounds (600, 290, 80, 100);
+    feedbackSlider_.setBounds (530, 290, 80, 100);
     
 }
