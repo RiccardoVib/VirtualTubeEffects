@@ -1,117 +1,57 @@
 /*
-  ==============================================================================
-
-    DelayLine.cpp
-    Created: 5 Dec 2018 3:29:32pm
-    Author:  Riccardo Simionato
-
-  ==============================================================================
-*/
+ ==============================================================================
+ 
+ DelayLine.cpp
+ Created: 5 Dec 2018 3:57:36pm
+ Author:  Riccardo Simionato
+ 
+ ==============================================================================
+ */
 
 #include "DelayLine.h"
-
-#include <iostream>
 #include <math.h>
 
 
-void DelayLine::suspend(){
+double DelayLine::hermiteInterpolation(double* pointer, double* buffer, int bufferLength, double frac){
     
-    memset(delayBufferLeft_, 0, delayBufferLength_*sizeof(double));
-    memset(delayBufferRight_, 0, delayBufferLength_*sizeof(double));
+    // Hermite polynomial interpolation
+    // 4-point, 3rd-order Hermite (x-form)
+    static double c0, c1, c2, c3;
+    double y;
+    double *y_1 = (pointer - 1);
+    double *y_2 = (pointer - 2);
+    double *y_3 = (pointer - 3);
+    
+    if (y_1 < buffer) { y_1 += bufferLength; }
+    if (y_2 < buffer) { y_2 += bufferLength; }
+    if (y_3 < buffer) { y_3 += bufferLength; }
+    
+    c0 = *y_1;
+    c1 = (1.0/2.0)*(*y_2 - *pointer);
+    c2 = (*pointer - (5.0/2.0)* *y_1) + (2.0* *y_2 - (1.0/2.0)* *y_3);
+    c3 = (1.0/2.0)*(*y_3 - *pointer) + (3.0/2.0)*(*y_1 - *y_2);
+    
+    return y = ((c3*frac+c2)*frac+c1)*frac+c0;
+    
 }
 
 
-double DelayLine::delayLine_Vibrato_L(double x, double samples){
+double DelayLine::delayLine(double x, double samples, int channel){
     
-    double y;
+    rptr[channel] = wptr[channel] - (long)samples;
+    while (rptr[channel] < delayBuffer[channel]) { rptr[channel] += delayBufferLength_; }
     
-    rptrLeft = wptrLeft - (long)samples;// - 3;// + delayBufferLength_ - 3;
-    while (rptrLeft < delayBufferLeft_) { rptrLeft += delayBufferLength_; }
+    fracDelaySamples[channel] = samples - (long)samples;
     
-    double fraction = samples - (long)samples;
+    double y = hermiteInterpolation(rptr[channel], delayBuffer[channel], delayBufferLength_, fracDelaySamples[channel]);
     
-    y = hermiteInterpolation(rptrLeft, delayBufferLeft_, delayBufferLength_, fraction);
+    rptr[channel] += 1;
     
-    *wptrLeft++ = x;
+    *wptr[channel]++ = x;
     
-    rptrLeft += 1;
-    
-    if (wptrLeft - delayBufferLeft_ >= delayBufferLength_) { wptrLeft -= delayBufferLength_; }
-    if (rptrLeft - delayBufferLeft_ >= delayBufferLength_) { rptrLeft -= delayBufferLength_; }
-    
+    if (rptr[channel] - delayBuffer[channel] >= delayBufferLength_) { rptr[channel] -= delayBufferLength_; }
+    if (wptr[channel] - delayBuffer[channel] >= delayBufferLength_) { wptr[channel] -= delayBufferLength_; }
     
     return y;
     
 }
-
-
-double DelayLine::delayLine_Vibrato_R(double x, double samples){
-    
-    double y;
-    
-    rptrRight = wptrRight - (long)samples;// - 3;// + delayBufferLength_ - 3;
-    while (rptrRight < delayBufferRight_) { rptrRight += delayBufferLength_; }
-    
-    double fraction = samples - (long)samples;
-    
-    y = hermiteInterpolation(rptrRight, delayBufferRight_, delayBufferLength_, fraction);
-    
-    *wptrRight++ = x;
-    
-    rptrRight += 1;
-    
-    if (wptrRight - delayBufferRight_ >= delayBufferLength_) { wptrRight -= delayBufferLength_; }
-    if (rptrRight - delayBufferRight_ >= delayBufferLength_) { rptrRight -= delayBufferLength_; }
-    
-    return y;
-    
-}
-
-
-double DelayLine::delayLine_Vibrato_Ref_L(double x, double samples){
-    
-    double y;
-    
-    rptrLeft_Ref = wptrLeft_Ref - (long)samples;// - 3;// + delayBufferLength_ - 3;
-    while (rptrLeft_Ref < delayBufferLeftRef_) { rptrLeft_Ref += delayBufferLengthRef_; }
-    
-    double fraction = samples - (long)samples;
-    
-    y = hermiteInterpolation(rptrLeft_Ref, delayBufferLeftRef_, delayBufferLengthRef_, fraction);
-    
-    *wptrLeft_Ref++ = x;
-    
-    rptrLeft_Ref += 1;
-    
-    if (rptrLeft_Ref - delayBufferLeftRef_ >= delayBufferLengthRef_) { rptrLeft_Ref -= delayBufferLengthRef_; }
-    if (wptrLeft_Ref - delayBufferLeftRef_ >= delayBufferLengthRef_) { wptrLeft_Ref -= delayBufferLengthRef_; }
-    
-    
-    return y;
-    
-}
-
-
-double DelayLine::delayLine_Vibrato_Ref_R(double x, double samples){
-    
-    double y;
-    
-    rptrRight_Ref = wptrRight_Ref - (long)samples;// - 3;// + delayBufferLength_ - 3;
-    while (rptrRight_Ref < delayBufferRightRef_) { rptrRight_Ref += delayBufferLengthRef_; }
-    
-    double fraction = samples - (long)samples;
-    
-    y = hermiteInterpolation(rptrRight_Ref, delayBufferRightRef_, delayBufferLengthRef_, fraction);
-    
-    *wptrRight_Ref++ = x;
-    
-    rptrRight_Ref += 1;
-    
-    if (rptrRight_Ref - delayBufferRightRef_ >= delayBufferLengthRef_) { rptrRight_Ref -= delayBufferLengthRef_; }
-    if (wptrRight_Ref - delayBufferRightRef_ >= delayBufferLengthRef_) { wptrRight_Ref -= delayBufferLengthRef_; }
-    
-    
-    return y;
-    
-}
-

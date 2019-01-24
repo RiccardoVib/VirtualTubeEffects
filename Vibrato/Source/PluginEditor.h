@@ -44,24 +44,24 @@ private:
 
     VirtualTubeVibratoAudioProcessor& processor;
 
-    Label tubeLengthLeftLabel_, tubeLengthRightLabel_, gainLeftLabel_, gainRightLabel_, tubeSizeLabel_, tubeEndLeftLabel_, tubeEndRightLabel_, gainRefLeftLabel_, gainRefRightLabel_;
+    Label delayTimeLeftLabel_, delayTimeRightLabel_, gainLeftLabel_, gainRightLabel_, tubeSizeLabel_, dryWetMixLabel_, delayTimeRefLeftLabel_, delayTimeRefRightLabel_, gainRefLeftLabel_, gainRefRightLabel_;
     
-    Slider tubeLengthLeftSlider_, tubeLengthRightSlider_, gainLeftSlider_, gainRightSlider_, tubeSizeSlider_, tubeEndLeftSlider_, tubeEndRightSlider_, gainRefLeftSlider_, gainRefRightSlider_;
+    Slider delayTimeLeftSlider_, delayTimeRightSlider_, gainLeftSlider_, gainRightSlider_, tubeSizeSlider_, delayTimeRefLeftSlider_, delayTimeRefRightSlider_, gainRefLeftSlider_, gainRefRightSlider_;
     
     Slider widthSlider_, frequencyRateSlider_;
     
     Label widthLabel_, frequencyRateLabel_;
     
-    TextEditor delayMsL_, delayMsR_, delayMsRefL_, delayMsRefR_, gainText_, gainRefText_, tubeLengthText_, tubeEndText_;
+    TextEditor delayMsL_, delayMsR_, delayMsRefL_, delayMsRefR_, delayTimeText_;
     
     
-    ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> tubeLengthLeftAttachment;
-    ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> tubeLengthRightAttachment;
+    ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> delayTimeLeftAttachment;
+    ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> delayTimeRightAttachment;
     ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> gainLeftAttachment;
     ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> gainRightAttachment;
     ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> tubeSizeAttachment;
-    ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> tubeEndLeftAttachment;
-    ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> tubeEndRightAttachment;
+    ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> delayTimeRefLeftAttachment;
+    ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> delayTimeRefRightAttachment;
     ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> gainRefLeftAttachment;
     ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> gainRefRightAttachment;
     ScopedPointer<AudioProcessorValueTreeState::SliderAttachment> widthAttachment;
